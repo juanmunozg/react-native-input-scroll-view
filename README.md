@@ -7,9 +7,10 @@ Mainly to achieve the following functions：
 - When the multiline `TextInput` create new line, the new line will automatically adjust to the top of the keyboard.
 - Put your finger on top of `TextInput` and slide `ScrollView`, when you lift your finger, the `TextInput` will not get focus.
 
-All of these features are for IOS only.
 
-![demo](https://github.com/baijunjie/react-native-input-scroll-view/blob/master/demo.gif)
+<img src="https://github.com/baijunjie/react-native-input-scroll-view/blob/master/images/demo.ios.gif" width="240">&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="https://github.com/baijunjie/react-native-input-scroll-view/blob/master/images/demo.android.gif" width="240">
+
 
 ## Installation
 
@@ -34,45 +35,58 @@ Does not contain multiline `TextInput`
 ```jsx
 import InputScrollView from 'react-native-input-scroll-view';
 ...
+state = {
+    text: '',
+};
+
 render() {
+    const { text } = this.state;
     return (
         <InputScrollView>
             <TextInput />
             <TextInput />
-            <TextInput />
-      	</InputScrollView>
-    );
-}
-```
-
-Contains multiline `TextInput`
-
-```jsx
-import InputScrollView from 'react-native-input-scroll-view';
-...
-constructor(props) {
-    super(props);
-    this.state = {
-        multiLineInputHandles: null,
-    };
-}
-
-render() {
-    return (
-        <InputScrollView getMultiLineInputHandles={handles => this.setState({multiLineInputHandles: handles})}>
-            <TextInput />
-            <TextInput />
-            <TextInput />
-            <TextInput value={this.state.remarks}
-              onChangeText={text => this.setState({remarks: text})}
-              multiline
-              {...this.state.multiLineInputHandles} />
+            <TextInput value={this.state.text}
+                       onChangeText={text => this.setState({ text })}
+                       multiline />
       	</InputScrollView>
     );
 }
 ```
 
 **Note that if the cursor is to be correctly adjusted to the top of the keyboard, you must bind `value` to `TextInput`.**
+
+## Multiline TextInput in the Android
+
+Because in Android, the height of the Multiline `TextInput` cannot be changed according to its content, so we need to add additional processing code
+
+```jsx
+import InputScrollView from 'react-native-input-scroll-view';
+...
+
+state = {
+    text: '',
+    textareaHeight: null,
+};
+
+render() {
+    const { text, textareaHeight } = this.state;
+    return (
+        <InputScrollView>
+            <TextInput />
+            <TextInput />
+            <TextInput style={{ height: textareaHeight }}
+                       value={text}
+                       onChangeText={text => this.setState({ text })}
+                       onContentSizeChange={this._onContentSizeChange}
+                       multiline />
+      	</InputScrollView>
+    );
+}
+
+_onContentSizeChange = ({nativeEvent:event}) => {
+    this.setState({ textareaHeight: event.contentSize.height });
+};
+```
 
 
 
@@ -84,23 +98,11 @@ render() {
 
 When automatic adjustment, the cursor relative to the top of the keyboard offset.
 
-#### props.topOffset
+#### props.multilineInputStyle
 
-`default: 0`
+`default: { fontSize: 17 }`
 
-If your `ScrollView` is at a distance from the top of the window, say a `navigatorHeight` distance, then set it to `navigatorHeight`.
-
-#### props.bottomOffset
-
-`default: 0`
-
-If your `ScrollView` is at a distance from the bottom of the window, say a `tabBarHeight` distance, then set it to `tabBarHeight`.
-
-#### props.getMultiLineInputHandles
-
-`default: null`
-
-If I set it to a function, this function returns an object, this object contains two more event callbacks, `onSelectionChange` and `onContentSizeChange`,  to deal with the corresponding event of multiline `TextInput`.
+If your multiline `TextInput` has a specific style, to ensure that the cursor can be accurately adjusted to the top of the keyboard, this is set as a multiline `TextInput` style, The style attributes that mainly include `fontSize`、`fontFamily`、`lineHeight` etc. affect the position of the cursor. **Be careful not to include `width` and `height`**.
 
 
 
@@ -110,6 +112,12 @@ If I set it to a function, this function returns an object, this object contains
 "react": "^16.0.0-alpha.12"
 "react-native": ">=0.46.0"
 ```
+
+
+
+## Produt case
+
+[![App_Store](https://github.com/baijunjie/react-native-input-scroll-view/blob/master/images/App_Store.png)](https://itunes.apple.com/us/app/id-butler-free/id1291749714?mt=8)
 
 
 
